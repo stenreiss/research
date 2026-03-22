@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bitcoin Identity Shift - SEC Corpus Analysis (2013-2025)</title>
+  <meta name="description" content="How SEC filings reveal Bitcoin's reclassification from 'currency' to 'asset'. Corpus linguistics analysis of 17,000+ filings.">
+  <meta property="og:title" content="The Identity Shift: From Currency to Asset">
+  <meta property="og:description" content="Corpus linguistics analysis of 17,000+ SEC filings traces Bitcoin's reclassification in the language of regulated finance (2013-2025). By Steven Reiss.">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="author" content="Steven Reiss">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Marcellus&family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #e8e8e8;
+      font-family: 'PT Serif', serif;
+      color: #342e2e;
+      min-height: 100vh;
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+
+    .container { max-width: 1000px; margin: 0 auto; }
+
+    .badge {
+      color: #8b6d4f;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge::before {
+      content: '';
+      width: 4px;
+      height: 24px;
+      background: linear-gradient(180deg, #8b6d4f, #a07d5e);
+      border-radius: 2px;
+    }
+
+    h1 {
+      font-family: 'Marcellus', serif;
+      font-size: 32px;
+      font-weight: 400;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+      line-height: 1.25;
+      color: #342e2e;
+    }
+
+    .subtitle {
+      color: #5a544e;
+      font-family: 'PT Serif', serif;
+      font-size: 14px;
+      margin-bottom: 28px;
+      max-width: 900px;
+      font-style: italic;
+    }
+
+    .toggles {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .toggles .sep {
+      width: 1px;
+      height: 24px;
+      background: rgba(52,46,46,0.15);
+      margin: 0 4px;
+    }
+
+    .toggle-btn {
+      border-radius: 6px;
+      padding: 7px 14px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1.5px solid;
+      font-family: 'PT Serif', serif;
+      font-weight: 500;
+      background: transparent;
+    }
+    .toggle-btn:hover { transform: translateY(-1px); }
+    .toggle-btn.active {
+      background: var(--color, #666);
+      border-color: var(--color, #666);
+      color: #faf9f5;
+      font-weight: 600;
+    }
+    .toggle-btn.inactive {
+      border-color: var(--color, #666);
+      color: var(--color, #666);
+    }
+
+    .chart-container {
+      background: #342e2e;
+      border-radius: 14px;
+      border: 1px solid rgba(52,46,46,0.15);
+      padding: 20px;
+      margin-bottom: 28px;
+      position: relative;
+      height: 540px;
+    }
+
+    #mainChart {
+      display: block;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+
+    .stat {
+      border-radius: 10px;
+      padding: 18px;
+      border: 1px solid rgba(52,46,46,0.12);
+      background: #fbfbfb;
+    }
+    .stat.orange { background: rgba(200,149,108,0.08); border-color: rgba(139,109,79,0.25); }
+    .stat.cyan { background: rgba(126,184,201,0.08); border-color: rgba(90,140,158,0.25); }
+    .stat.accent { background: rgba(200,149,108,0.06); border-color: rgba(139,109,79,0.2); }
+    .stat.info { background: rgba(207,205,199,0.3); border-color: rgba(52,46,46,0.1); }
+
+    .stat-val {
+      font-size: 22px;
+      font-weight: 700;
+      color: #342e2e;
+      margin-bottom: 4px;
+    }
+    .stat-val .label {
+      font-size: 13px;
+      color: #5a544e;
+      font-weight: 500;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: #5a544e;
+      line-height: 1.5;
+    }
+
+
+    .insight {
+      background: #fbfbfb;
+      border-radius: 10px;
+      border-left: 4px solid;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .insight.observation {
+      border-left-color: rgba(52,46,46,0.2);
+    }
+
+    .insight-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #5a544e;
+      margin-bottom: 10px;
+    }
+
+    .insight-text {
+      font-size: 13px;
+      color: #4a453f;
+      line-height: 1.7;
+    }
+
+    .milestones-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin: 28px 0;
+    }
+
+    .milestone-item {
+      background: #fbfbfb;
+      border: 1px solid rgba(52,46,46,0.1);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .milestone-item .date {
+      color: #5a544e;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .milestone-item .name {
+      color: #342e2e;
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .methodology {
+      background: #fbfbfb;
+      border-radius: 10px;
+      border: 1px solid rgba(52,46,46,0.1);
+      padding: 18px;
+      margin: 28px 0;
+      font-size: 12px;
+      color: #5a544e;
+      line-height: 1.7;
+    }
+
+    .methodology-title {
+      font-family: 'Marcellus', serif;
+      font-size: 13px;
+      font-weight: 400;
+      margin-bottom: 10px;
+      color: #342e2e;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+      border-top: 1px solid rgba(52,46,46,0.15);
+      font-size: 11px;
+      color: #7a756f;
+      margin-top: 40px;
+      flex-wrap: nowrap;
+    }
+
+    .footer .left { flex: 1; }
+    .footer .right { flex: 0; white-space: nowrap; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="badge">BITCOIN NARRATIVE INTELLIGENCE - STUDY I</div>
+    <h1>The Identity Shift: From "Currency" to "Asset"</h1>
+    <div class="subtitle">Tracing Bitcoin's reclassification in the language of regulated finance. A corpus linguistics analysis of &gt;17,000 SEC filings (2013-2025)</div>
+
+    <div class="toggles" id="toggles"></div>
+
+    <div class="chart-container">
+      <canvas id="mainChart"></canvas>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="insight observation">
+      <div class="insight-title">Key finding</div>
+      <div class="insight-text">In 2016, "currency" appeared 20 times per 1,000 bitcoin mentions in SEC filings; "asset" appeared 30. By 2025, "asset" had risen to 79 while "currency" had fallen to 4. The crossover becomes permanent in mid-2019, before MicroStrategy's treasury pivot, before Tesla's 10-K disclosure, and years before the spot ETF approval. Even excluding ETF and mining filers, "asset" overtakes "currency" by 2017. The language shift preceded the institutional shift, not the other way around.</div>
+    </div>
+
+    <div class="milestones-grid" id="milestonesGrid"></div>
+
+    <div class="methodology">
+      <div class="methodology-title">Methodology</div>
+      Corpus: &gt;17,000 SEC filings containing "bitcoin" (228M+ words, Jul 2013-Dec 2025; 10-K, 10-Q, S-1, 8-K, and related forms). Collocation analysis: lemmatized terms (asset/assets, currency/currencies, commodity/commodities) within a &plusmn;5-word window of each "bitcoin" mention. Metric: collocations per 1,000 bitcoin mentions, smoothed by 3-month rolling average weighted by document mention count. Note: early months (2013-2015) have significantly fewer filings; spikes in that period reflect thin data, not structural shifts. Reference statistics use 2016 as baseline (40,000+ mentions). Robustness: finding confirmed stable across window sizes 3, 5, and 7, and with and without lemmatization. The crossover year and direction of the shift are identical in all variants; only the absolute rates change. Work in progress. Full study includes actor decomposition, form-type stratification (8-K vs. S-1 vs. 10-K), and collocation significance testing (log-likelihood, MI).
+    </div>
+
+    <div class="footer">
+      <div class="left">Bitcoin Narrative Intelligence | &gt;17,000 SEC Filings | 228M+ Words | 1.6M Bitcoin Mentions | Price: CoinGecko</div>
+      <div class="right">Steven Reiss, 2026</div>
+    </div>
+  </div>
+
+  <script>
+    // === DATA ===
+
+    const priceData = {
+      "2013-07":110,"2013-10":204,"2013-12":755,"2014-02":567,"2014-03":457,"2014-04":445,"2014-05":620,"2014-06":638,"2014-07":583,"2014-08":480,"2014-09":387,"2014-10":337,"2014-11":376,"2014-12":317,"2015-01":218,"2015-03":243,"2015-04":236,"2015-05":230,"2015-06":262,"2015-07":284,"2015-08":230,"2015-09":236,"2015-10":312,"2015-11":378,"2015-12":431,"2016-01":364,"2016-02":437,"2016-03":415,"2016-04":448,"2016-05":531,"2016-06":672,"2016-07":624,"2016-08":572,"2016-09":608,"2016-10":699,"2016-11":742,"2016-12":967,"2017-01":968,"2017-02":1190,"2017-03":1078,"2017-04":1350,"2017-05":2329,"2017-06":2491,"2017-07":2871,"2017-08":4703,"2017-09":4298,"2017-10":6369,"2017-11":10406,"2017-12":14840,"2018-01":9990,"2018-02":10709,"2018-03":6897,"2018-04":9326,"2018-05":7381,"2018-06":6182,"2018-07":8186,"2018-08":7024,"2018-09":6606,"2018-10":6332,"2018-11":4279,"2018-12":3810,"2019-01":3458,"2019-02":3813,"2019-03":4104,"2019-04":5200,"2019-05":8311,"2019-06":11973,"2019-07":9568,"2019-08":9589,"2019-09":8064,"2019-10":9172,"2019-11":7721,"2019-12":7240,"2020-01":9510,"2020-02":8717,"2020-03":6403,"2020-04":8744,"2020-05":9663,"2020-06":9185,"2020-07":11116,"2020-08":11701,"2020-09":10838,"2020-10":13537,"2020-11":18170,"2020-12":28837,"2021-01":34200,"2021-02":46654,"2021-03":58669,"2021-04":53597,"2021-05":35715,"2021-06":35969,"2021-07":41936,"2021-08":47124,"2021-09":41588,"2021-10":61837,"2021-11":57849,"2021-12":47192,"2022-01":37983,"2022-02":37804,"2022-03":47063,"2022-04":38651,"2022-05":31741,"2022-06":20109,"2022-07":23653,"2022-08":19805,"2022-09":19564,"2022-10":20624,"2022-11":16442,"2022-12":16604,"2023-01":22840,"2023-02":23518,"2023-03":28041,"2023-04":29218,"2023-05":27714,"2023-06":30467,"2023-07":29278,"2023-08":27297,"2023-09":26917,"2023-10":34499,"2023-11":37810,"2023-12":42221,"2024-01":42892,"2024-02":62559,"2024-03":69702,"2024-04":63798,"2024-05":68372,"2024-06":60864,"2024-07":66219,"2024-08":59156,"2024-09":65664,"2024-10":72343,"2024-11":97453,"2024-12":92627,"2025-01":104782,"2025-02":84709,"2025-03":82356,"2025-04":94256,"2025-05":104011,"2025-06":108397,"2025-07":117833,"2025-08":108782,"2025-09":114309,"2025-10":108241,"2025-11":90841,"2025-12":88415
+    };
+
+const rawData = {
+  "2013-07": { asset: 14.26, currency: 7.13, commodity: 1.78, mentions: 561 },
+  "2013-09": { asset: 0.0, currency: 111.11, commodity: 0.0, mentions: 9 },
+  "2013-10": { asset: 10.97, currency: 10.97, commodity: 1.37, mentions: 729 },
+  "2013-11": { asset: 0.0, currency: 500.0, commodity: 0.0, mentions: 2 },
+  "2013-12": { asset: 29.41, currency: 39.22, commodity: 0.0, mentions: 102 },
+  "2014-01": { asset: 0.0, currency: 55.56, commodity: 0.0, mentions: 18 },
+  "2014-02": { asset: 7.85, currency: 22.67, commodity: 0.87, mentions: 1147 },
+  "2014-03": { asset: 0.0, currency: 61.64, commodity: 0.0, mentions: 292 },
+  "2014-04": { asset: 19.23, currency: 38.46, commodity: 0.0, mentions: 104 },
+  "2014-05": { asset: 16.85, currency: 17.98, commodity: 0.0, mentions: 890 },
+  "2014-06": { asset: 0.0, currency: 20.0, commodity: 0.0, mentions: 100 },
+  "2014-07": { asset: 5.45, currency: 21.82, commodity: 0.0, mentions: 1100 },
+  "2014-08": { asset: 12.66, currency: 63.29, commodity: 0.0, mentions: 79 },
+  "2014-09": { asset: 0.0, currency: 25.32, commodity: 0.0, mentions: 79 },
+  "2014-10": { asset: 20.41, currency: 88.44, commodity: 0.0, mentions: 147 },
+  "2014-11": { asset: 46.51, currency: 63.95, commodity: 5.81, mentions: 172 },
+  "2014-12": { asset: 7.19, currency: 13.35, commodity: 0.0, mentions: 974 },
+  "2015-01": { asset: 0.0, currency: 82.35, commodity: 0.0, mentions: 170 },
+  "2015-02": { asset: 90.91, currency: 204.55, commodity: 0.0, mentions: 44 },
+  "2015-03": { asset: 26.55, currency: 274.34, commodity: 0.0, mentions: 113 },
+  "2015-04": { asset: 2.55, currency: 40.82, commodity: 0.0, mentions: 784 },
+  "2015-05": { asset: 18.78, currency: 112.68, commodity: 0.0, mentions: 213 },
+  "2015-06": { asset: 6.64, currency: 29.22, commodity: 0.0, mentions: 753 },
+  "2015-07": { asset: 8.89, currency: 53.33, commodity: 0.0, mentions: 225 },
+  "2015-08": { asset: 3.73, currency: 74.63, commodity: 0.0, mentions: 268 },
+  "2015-09": { asset: 1.93, currency: 44.32, commodity: 0.0, mentions: 519 },
+  "2015-10": { asset: 0.0, currency: 100.0, commodity: 0.0, mentions: 60 },
+  "2015-11": { asset: 1.88, currency: 45.97, commodity: 0.0, mentions: 1066 },
+  "2015-12": { asset: 6.23, currency: 45.17, commodity: 1.56, mentions: 642 },
+  "2016-01": { asset: 3.55, currency: 42.63, commodity: 1.78, mentions: 563 },
+  "2016-02": { asset: 5.78, currency: 40.46, commodity: 1.93, mentions: 1038 },
+  "2016-03": { asset: 26.24, currency: 21.18, commodity: 3.68, mentions: 2172 },
+  "2016-04": { asset: 31.77, currency: 22.07, commodity: 1.77, mentions: 1133 },
+  "2016-05": { asset: 26.48, currency: 24.14, commodity: 7.79, mentions: 1284 },
+  "2016-06": { asset: 38.35, currency: 16.35, commodity: 4.4, mentions: 3181 },
+  "2016-07": { asset: 29.68, currency: 18.5, commodity: 5.78, mentions: 2594 },
+  "2016-08": { asset: 33.61, currency: 13.45, commodity: 1.68, mentions: 1190 },
+  "2016-09": { asset: 32.28, currency: 11.59, commodity: 1.66, mentions: 1208 },
+  "2016-10": { asset: 36.48, currency: 19.94, commodity: 6.32, mentions: 2056 },
+  "2016-11": { asset: 20.61, currency: 21.18, commodity: 8.01, mentions: 1747 },
+  "2016-12": { asset: 41.74, currency: 21.58, commodity: 6.57, mentions: 2132 },
+  "2017-01": { asset: 22.5, currency: 16.55, commodity: 7.94, mentions: 1511 },
+  "2017-02": { asset: 38.3, currency: 17.09, commodity: 5.01, mentions: 3394 },
+  "2017-03": { asset: 12.68, currency: 13.39, commodity: 4.23, mentions: 1419 },
+  "2017-04": { asset: 18.87, currency: 37.74, commodity: 0.0, mentions: 53 },
+  "2017-05": { asset: 18.06, currency: 13.55, commodity: 2.58, mentions: 1550 },
+  "2017-06": { asset: 51.95, currency: 27.83, commodity: 5.57, mentions: 539 },
+  "2017-07": { asset: 22.47, currency: 22.47, commodity: 0.0, mentions: 89 },
+  "2017-08": { asset: 45.01, currency: 26.61, commodity: 8.21, mentions: 3044 },
+  "2017-09": { asset: 61.0, currency: 21.26, commodity: 6.47, mentions: 1082 },
+  "2017-10": { asset: 28.02, currency: 30.17, commodity: 12.93, mentions: 464 },
+  "2017-11": { asset: 39.72, currency: 37.24, commodity: 7.45, mentions: 2014 },
+  "2017-12": { asset: 53.58, currency: 20.05, commodity: 6.57, mentions: 8978 },
+  "2018-01": { asset: 42.9, currency: 38.46, commodity: 2.96, mentions: 3380 },
+  "2018-02": { asset: 32.29, currency: 25.01, commodity: 1.82, mentions: 2199 },
+  "2018-03": { asset: 51.39, currency: 31.92, commodity: 2.87, mentions: 3133 },
+  "2018-04": { asset: 59.47, currency: 31.47, commodity: 3.47, mentions: 3750 },
+  "2018-05": { asset: 53.3, currency: 28.75, commodity: 2.86, mentions: 5253 },
+  "2018-06": { asset: 36.21, currency: 37.59, commodity: 2.76, mentions: 2900 },
+  "2018-07": { asset: 64.89, currency: 79.11, commodity: 5.33, mentions: 1125 },
+  "2018-08": { asset: 61.17, currency: 91.35, commodity: 1.63, mentions: 1226 },
+  "2018-09": { asset: 22.37, currency: 84.21, commodity: 6.58, mentions: 760 },
+  "2018-10": { asset: 59.91, currency: 33.28, commodity: 1.07, mentions: 4657 },
+  "2018-11": { asset: 59.12, currency: 65.25, commodity: 2.23, mentions: 1793 },
+  "2018-12": { asset: 40.63, currency: 26.36, commodity: 0.93, mentions: 3224 },
+  "2019-01": { asset: 26.45, currency: 28.31, commodity: 3.1, mentions: 4839 },
+  "2019-02": { asset: 47.77, currency: 41.56, commodity: 3.6, mentions: 3056 },
+  "2019-03": { asset: 57.14, currency: 75.51, commodity: 10.2, mentions: 980 },
+  "2019-04": { asset: 38.62, currency: 50.07, commodity: 4.04, mentions: 4454 },
+  "2019-05": { asset: 61.12, currency: 40.23, commodity: 2.54, mentions: 5121 },
+  "2019-06": { asset: 43.97, currency: 30.64, commodity: 3.4, mentions: 3525 },
+  "2019-07": { asset: 38.19, currency: 61.86, commodity: 1.61, mentions: 1859 },
+  "2019-08": { asset: 35.91, currency: 51.18, commodity: 6.88, mentions: 1309 },
+  "2019-09": { asset: 41.54, currency: 21.79, commodity: 3.29, mentions: 6379 },
+  "2019-10": { asset: 39.76, currency: 13.78, commodity: 4.54, mentions: 6388 },
+  "2019-11": { asset: 24.66, currency: 12.71, commodity: 2.8, mentions: 5352 },
+  "2019-12": { asset: 72.04, currency: 41.43, commodity: 5.97, mentions: 2679 },
+  "2020-01": { asset: 55.91, currency: 33.18, commodity: 8.18, mentions: 2200 },
+  "2020-02": { asset: 41.43, currency: 24.86, commodity: 3.55, mentions: 3379 },
+  "2020-03": { asset: 40.79, currency: 58.51, commodity: 2.68, mentions: 3726 },
+  "2020-04": { asset: 35.4, currency: 24.05, commodity: 2.75, mentions: 2910 },
+  "2020-05": { asset: 72.76, currency: 12.13, commodity: 0.51, mentions: 1979 },
+  "2020-06": { asset: 57.8, currency: 29.11, commodity: 4.96, mentions: 4637 },
+  "2020-07": { asset: 87.67, currency: 68.4, commodity: 2.89, mentions: 1038 },
+  "2020-08": { asset: 80.98, currency: 54.63, commodity: 12.68, mentions: 1025 },
+  "2020-09": { asset: 48.19, currency: 40.96, commodity: 8.84, mentions: 1245 },
+  "2020-10": { asset: 44.36, currency: 28.93, commodity: 0.96, mentions: 1037 },
+  "2020-11": { asset: 40.06, currency: 29.28, commodity: 1.03, mentions: 1947 },
+  "2020-12": { asset: 75.32, currency: 24.37, commodity: 3.1, mentions: 2257 },
+  "2021-01": { asset: 59.93, currency: 23.21, commodity: 3.8, mentions: 4739 },
+  "2021-02": { asset: 64.13, currency: 20.83, commodity: 3.11, mentions: 5473 },
+  "2021-03": { asset: 60.53, currency: 16.86, commodity: 3.77, mentions: 12457 },
+  "2021-04": { asset: 48.77, currency: 24.18, commodity: 3.47, mentions: 11830 },
+  "2021-05": { asset: 70.63, currency: 16.03, commodity: 5.78, mentions: 12290 },
+  "2021-06": { asset: 54.15, currency: 14.68, commodity: 1.71, mentions: 7017 },
+  "2021-07": { asset: 64.13, currency: 15.51, commodity: 8.96, mentions: 12053 },
+  "2021-08": { asset: 65.25, currency: 16.64, commodity: 3.3, mentions: 16047 },
+  "2021-09": { asset: 61.48, currency: 16.54, commodity: 2.93, mentions: 13663 },
+  "2021-10": { asset: 66.41, currency: 11.61, commodity: 4.24, mentions: 27390 },
+  "2021-11": { asset: 75.11, currency: 12.81, commodity: 3.11, mentions: 20929 },
+  "2021-12": { asset: 72.82, currency: 14.39, commodity: 7.35, mentions: 16603 },
+  "2022-01": { asset: 76.05, currency: 13.89, commodity: 14.69, mentions: 13755 },
+  "2022-02": { asset: 72.1, currency: 10.9, commodity: 4.25, mentions: 14590 },
+  "2022-03": { asset: 70.25, currency: 11.96, commodity: 2.82, mentions: 16641 },
+  "2022-04": { asset: 66.54, currency: 14.15, commodity: 4.28, mentions: 16816 },
+  "2022-05": { asset: 93.17, currency: 11.05, commodity: 2.48, mentions: 13309 },
+  "2022-06": { asset: 48.58, currency: 11.41, commodity: 3.2, mentions: 14987 },
+  "2022-07": { asset: 67.24, currency: 10.13, commodity: 8.51, mentions: 7406 },
+  "2022-08": { asset: 86.47, currency: 10.56, commodity: 9.1, mentions: 10223 },
+  "2022-09": { asset: 66.28, currency: 10.46, commodity: 6.5, mentions: 11376 },
+  "2022-10": { asset: 54.28, currency: 11.82, commodity: 20.57, mentions: 6853 },
+  "2022-11": { asset: 56.38, currency: 10.27, commodity: 5.93, mentions: 11298 },
+  "2022-12": { asset: 58.33, currency: 13.96, commodity: 14.55, mentions: 6875 },
+  "2023-01": { asset: 46.31, currency: 13.88, commodity: 12.4, mentions: 9436 },
+  "2023-02": { asset: 57.1, currency: 10.1, commodity: 5.16, mentions: 13766 },
+  "2023-03": { asset: 58.08, currency: 9.87, commodity: 6.38, mentions: 16616 },
+  "2023-04": { asset: 60.29, currency: 6.95, commodity: 7.28, mentions: 15392 },
+  "2023-05": { asset: 61.63, currency: 9.71, commodity: 3.15, mentions: 16485 },
+  "2023-06": { asset: 57.63, currency: 10.3, commodity: 3.01, mentions: 10967 },
+  "2023-07": { asset: 59.86, currency: 10.16, commodity: 9.18, mentions: 9155 },
+  "2023-08": { asset: 60.02, currency: 6.0, commodity: 3.0, mentions: 18010 },
+  "2023-09": { asset: 60.47, currency: 9.17, commodity: 7.24, mentions: 16569 },
+  "2023-10": { asset: 66.63, currency: 4.74, commodity: 4.61, mentions: 22798 },
+  "2023-11": { asset: 66.13, currency: 6.23, commodity: 3.25, mentions: 29534 },
+  "2023-12": { asset: 63.75, currency: 5.04, commodity: 3.71, mentions: 55735 },
+  "2024-01": { asset: 63.93, currency: 5.21, commodity: 3.31, mentions: 82664 },
+  "2024-02": { asset: 60.9, currency: 8.02, commodity: 3.22, mentions: 20820 },
+  "2024-03": { asset: 71.29, currency: 6.12, commodity: 4.01, mentions: 28926 },
+  "2024-04": { asset: 68.64, currency: 6.19, commodity: 2.72, mentions: 37454 },
+  "2024-05": { asset: 84.0, currency: 6.34, commodity: 2.8, mentions: 21774 },
+  "2024-06": { asset: 65.22, currency: 6.92, commodity: 3.08, mentions: 11698 },
+  "2024-07": { asset: 82.54, currency: 3.68, commodity: 2.39, mentions: 23384 },
+  "2024-08": { asset: 66.87, currency: 6.31, commodity: 2.4, mentions: 17109 },
+  "2024-09": { asset: 87.18, currency: 5.47, commodity: 3.76, mentions: 14625 },
+  "2024-10": { asset: 71.17, currency: 6.23, commodity: 4.73, mentions: 17970 },
+  "2024-11": { asset: 70.68, currency: 3.58, commodity: 2.54, mentions: 59157 },
+  "2024-12": { asset: 75.98, currency: 7.0, commodity: 4.93, mentions: 19860 },
+  "2025-01": { asset: 76.6, currency: 3.36, commodity: 3.98, mentions: 49962 },
+  "2025-02": { asset: 83.65, currency: 5.0, commodity: 2.54, mentions: 42979 },
+  "2025-03": { asset: 69.09, currency: 6.04, commodity: 3.48, mentions: 38239 },
+  "2025-04": { asset: 78.19, currency: 4.16, commodity: 2.41, mentions: 45620 },
+  "2025-05": { asset: 80.2, currency: 3.82, commodity: 1.5, mentions: 29288 },
+  "2025-06": { asset: 72.05, currency: 5.54, commodity: 2.41, mentions: 36973 },
+  "2025-07": { asset: 78.44, currency: 3.76, commodity: 2.1, mentions: 61514 },
+  "2025-08": { asset: 85.58, currency: 5.34, commodity: 2.46, mentions: 31270 },
+  "2025-09": { asset: 84.69, currency: 3.46, commodity: 3.5, mentions: 64789 },
+  "2025-10": { asset: 86.41, currency: 4.99, commodity: 3.64, mentions: 43095 },
+  "2025-11": { asset: 81.14, currency: 3.13, commodity: 3.37, mentions: 76576 },
+  "2025-12": { asset: 68.25, currency: 4.7, commodity: 3.92, mentions: 32103 },
+};
+
+
+    // === DATA PROCESSING ===
+    const labels = Object.keys(rawData).sort();
+
+    // === MILESTONES ===
+    const milestones = [
+      { month: "2013-07", label: "Winklevoss S-1", color: "#94a3b8" },
+      { month: "2017-01", label: "Grayscale S-1", color: "#94a3b8" },
+      { month: "2020-08", label: "MicroStrategy 8-K", color: "#e879f9" },
+      { month: "2021-02", label: "Tesla 10-K", color: "#e879f9" },
+      { month: "2021-10", label: "ProShares Futures ETF", color: "#f97316" },
+      { month: "2023-06", label: "iShares S-1", color: "#f97316" },
+      { month: "2024-01", label: "Spot ETF Approval", color: "#22d3ee" }
+    ];
+
+    const milestoneIndices = milestones.map(m => ({ ...m, i: labels.indexOf(m.month) })).filter(m => m.i >= 0);
+
+    const milestonePlugin = {
+      id: 'milestones',
+      afterDraw(chart) {
+        if (!visibility.milestones) return;
+        const ctx = chart.ctx;
+        const xScale = chart.scales.x;
+        const yScale = chart.scales.y;
+        milestoneIndices.forEach(ms => {
+          if (ms.i < 0) return;
+          const x = xScale.getPixelForValue(ms.i);
+          ctx.save();
+          ctx.strokeStyle = ms.color;
+          ctx.lineWidth = 1;
+          ctx.setLineDash([4, 4]);
+          ctx.globalAlpha = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(x, yScale.top);
+          ctx.lineTo(x, yScale.bottom);
+          ctx.stroke();
+          ctx.restore();
+          ctx.save();
+          ctx.fillStyle = ms.color;
+          ctx.globalAlpha = 0.7;
+          ctx.font = '9px "PT Serif", serif';
+          ctx.translate(x - 4, yScale.top + 8);
+          ctx.rotate(-Math.PI / 2);
+          ctx.textAlign = 'right';
+          ctx.fillText(ms.label, 0, 0);
+          ctx.restore();
+        });
+      }
+    };
+
+    // 3-month weighted rolling average for rawData
+    function smoothData(data, field) {
+      return labels.map((month, i) => {
+        let total = 0, weighted = 0;
+        for (let j = Math.max(0, i-1); j <= Math.min(labels.length-1, i+1); j++) {
+          const d = data[labels[j]];
+          if (d && d.mentions) {
+            total += d.mentions;
+            weighted += d[field] * d.mentions;
+          }
+        }
+        return total > 0 ? Math.round(weighted / total * 100) / 100 : 0;
+      });
+    }
+
+    const sAsset = smoothData(rawData, 'asset');
+    const sCurrency = smoothData(rawData, 'currency');
+    const sCommodity = smoothData(rawData, 'commodity');
+    const sPrice = labels.map(m => priceData[m] || null);
+
+    // === VISIBILITY TOGGLE ===
+    const visibility = {
+      asset: true,
+      currency: true,
+      commodity: true,
+      price: true,
+      milestones: true
+    };
+
+    // === DATASETS ===
+    const datasets = [
+      { label: 'Asset', data: sAsset, borderColor: '#c8956c', backgroundColor: 'rgba(200,149,108,0.12)', fill: true, borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 4, tension: 0.3, yAxisID: 'y', order: 3, _key: 'asset' },
+      { label: 'Currency', data: sCurrency, borderColor: '#7eb8c9', backgroundColor: 'rgba(126,184,201,0.1)', fill: true, borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 4, tension: 0.3, yAxisID: 'y', order: 4, _key: 'currency' },
+      { label: 'Commodity', data: sCommodity, borderColor: '#b8c474', backgroundColor: 'rgba(184,196,116,0.08)', fill: true, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.3, yAxisID: 'y', order: 5, _key: 'commodity' },
+      { label: 'BTC/USD', data: sPrice, borderColor: '#d4a574', backgroundColor: 'rgba(212,165,116,0.05)', fill: true, borderWidth: 1, borderDash: [0, 0], pointRadius: 0, pointHoverRadius: 4, tension: 0.3, yAxisID: 'y1', order: 7, _key: 'price' }
+    ];
+
+    // === MAIN CHART ===
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(52,46,46,0.96)',
+            borderColor: 'rgba(255,255,255,0.12)',
+            borderWidth: 1,
+            titleColor: '#faf9f5',
+            bodyColor: '#cfcdc7',
+            padding: 14,
+            cornerRadius: 10,
+            titleFont: { size: 13, weight: 600 },
+            bodyFont: { size: 12 },
+            callbacks: {
+              title: (items) => {
+                const m = items[0].label;
+                const [y, mo] = m.split('-');
+                const months = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                return months[parseInt(mo)] + ' ' + y;
+              },
+              label: (ctx) => {
+                if (ctx.dataset.hidden) return null;
+                const v = ctx.parsed.y;
+                if (v == null) return null;
+                if (ctx.dataset._key === 'price') return 'BTC/USD: $' + Math.round(v).toLocaleString();
+                return ctx.dataset.label + ': ' + v.toFixed(1) + '/1,000';
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: 'rgba(255,255,255,0.07)' },
+            border: { color: 'rgba(255,255,255,0.08)' },
+            ticks: {
+              color: '#a09d97',
+              font: { size: 10 },
+              callback: (val, i) => {
+                const m = labels[i];
+                return m && m.endsWith('-01') ? "'" + m.slice(2,4) : '';
+              },
+              maxRotation: 0
+            }
+          },
+          y: {
+            position: 'left',
+            grid: { color: 'rgba(255,255,255,0.07)' },
+            border: { color: 'rgba(255,255,255,0.08)' },
+            ticks: { color: '#a09d97', font: { size: 11 } },
+            title: { display: true, text: 'Collocation rate /1,000', color: '#cfcdc7', font: { size: 11 } },
+            min: 0
+          },
+          y1: {
+            position: 'right',
+            type: 'logarithmic',
+            min: 80,
+            max: 150000,
+            grid: { display: false },
+            border: { color: 'rgba(212,165,116,0.15)' },
+            ticks: {
+              color: '#a09d97',
+              font: { size: 10 },
+              callback: (v) => v >= 1000 ? '$' + (v/1000).toFixed(v >= 100000 ? 0 : 1) + 'k' : '$' + v
+            },
+            display: true
+          }
+        }
+      },
+      plugins: [milestonePlugin]
+    });
+
+    // === RENDER TOGGLES ===
+    const toggleDefs = [
+      { key: 'asset', label: 'Asset', color: '#a0724a' },
+      { key: 'currency', label: 'Currency', color: '#4a8fa3' },
+      { key: 'commodity', label: 'Commodity', color: '#7a8c3e' },
+      { key: 'price', label: 'BTC/USD', color: '#b08040' },
+      { key: 'milestones', label: 'Milestones', color: '#7a756f' }
+    ];
+
+    function renderToggles() {
+      const togglesEl = document.getElementById('toggles');
+      togglesEl.innerHTML = '';
+      toggleDefs.forEach(td => {
+        if (td.sep) {
+          const sep = document.createElement('div');
+          sep.className = 'sep';
+          togglesEl.appendChild(sep);
+          return;
+        }
+        const btn = document.createElement('button');
+        btn.className = 'toggle-btn';
+        btn.style.setProperty('--color', td.color);
+        btn.textContent = td.label;
+        btn.classList.add(visibility[td.key] ? 'active' : 'inactive');
+        btn.addEventListener('click', () => {
+          visibility[td.key] = !visibility[td.key];
+          const ds = chart.data.datasets.find(d => d._key === td.key);
+          if (ds) ds.hidden = !visibility[td.key];
+          chart.update();
+          renderToggles();
+        });
+        togglesEl.appendChild(btn);
+      });
+    }
+
+    renderToggles();
+
+    // === STATS CARDS ===
+    const statData = [
+      {
+        label: '"Asset" collocation rate',
+        val: '30 → 79 per 1,000',
+        sub: 'Weighted yearly average, 2016 vs. 2025 (+163%)',
+        class: 'orange'
+      },
+      {
+        label: '"Currency" collocation rate',
+        val: '20 → 4 per 1,000',
+        sub: 'Weighted yearly average, 2016 vs. 2025 (−80%)',
+        class: 'cyan'
+      },
+      {
+        label: 'Permanent crossover',
+        val: 'August 2019',
+        sub: '14 months before MicroStrategy, 53 months before spot ETF',
+        class: 'accent'
+      },
+      {
+        label: 'Corpus',
+        val: '1.6M Bitcoin mentions',
+        sub: '17,331 SEC filings · 228M words · Jul 2013-Dec 2025',
+        class: 'info'
+      }
+    ];
+
+    const statsEl = document.getElementById('stats');
+    statData.forEach(s => {
+      const statDiv = document.createElement('div');
+      statDiv.className = 'stat ' + s.class;
+      statDiv.innerHTML = `
+        <div class="stat-label">${s.label}</div>
+        <div class="stat-val">${s.val}</div>
+        <div class="stat-label">${s.sub}</div>
+      `;
+      statsEl.appendChild(statDiv);
+    });
+
+    // === MILESTONES GRID ===
+    const milestonesEl = document.getElementById('milestonesGrid');
+    milestones.forEach(m => {
+      const item = document.createElement('div');
+      item.className = 'milestone-item';
+      item.innerHTML = `
+        <div class="date">${m.month}</div>
+        <div class="name">${m.label}</div>
+      `;
+      milestonesEl.appendChild(item);
+    });
+  </script>
+</body>
+</html>
